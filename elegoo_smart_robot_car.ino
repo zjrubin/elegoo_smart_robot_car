@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include "HardwareSerial.h"
 #include "ArduinoJson-v6.11.1.h" //Use ArduinoJson Libraries
+#include "arduino_debug.h"
 
 #define f 16736925 // FORWARD
 #define b 16754775 // BACK
@@ -166,8 +167,7 @@ void forward(bool debug, int16_t in_carSpeed)
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, HIGH);
 
-    if (debug)
-        Serial.println("Go forward!");
+    debug_serial_println("forward");
 }
 /*
   Control motor：Car moving backwards
@@ -180,8 +180,8 @@ void back(bool debug, int16_t in_carSpeed)
     digitalWrite(IN2, HIGH);
     digitalWrite(IN3, HIGH);
     digitalWrite(IN4, LOW);
-    if (debug)
-        Serial.println("Go back!");
+
+    debug_serial_println("backward");
 }
 /*
   Control motor：The car turns left and moves forward
@@ -196,8 +196,8 @@ void left(bool debug, int16_t in_carSpeed)
 
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, HIGH);
-    if (debug)
-        Serial.println("Go left!");
+
+    debug_serial_println("left");
 }
 /*
   Control motor：The car turns right and moves forward
@@ -210,8 +210,8 @@ void right(bool debug, int16_t in_carSpeed)
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, HIGH);
     digitalWrite(IN4, LOW);
-    if (debug)
-        Serial.println("Go right!");
+
+    debug_serial_println("right");
 }
 
 void forward_left(bool debug, int16_t in_carSpeed)
@@ -222,8 +222,8 @@ void forward_left(bool debug, int16_t in_carSpeed)
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, HIGH);
-    if (debug)
-        Serial.println("Go right!");
+
+    debug_serial_println("forward left");
 }
 
 void forward_right(bool debug, int16_t in_carSpeed)
@@ -234,8 +234,8 @@ void forward_right(bool debug, int16_t in_carSpeed)
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, HIGH);
-    if (debug)
-        Serial.println("Go right!");
+
+    debug_serial_println("forward right");
 }
 
 void back_left(bool debug, int16_t in_carSpeed)
@@ -246,8 +246,8 @@ void back_left(bool debug, int16_t in_carSpeed)
     digitalWrite(IN2, HIGH);
     digitalWrite(IN3, HIGH);
     digitalWrite(IN4, LOW);
-    if (debug)
-        Serial.println("Go right!");
+
+    debug_serial_println("backward left");
 }
 
 void back_right(bool debug, int16_t in_carSpeed)
@@ -258,8 +258,8 @@ void back_right(bool debug, int16_t in_carSpeed)
     digitalWrite(IN2, HIGH);
     digitalWrite(IN3, HIGH);
     digitalWrite(IN4, LOW);
-    if (debug)
-        Serial.println("Go right!");
+
+    debug_serial_println("backward right");
 }
 
 /*
@@ -269,8 +269,8 @@ void stop(bool debug = false)
 {
     digitalWrite(ENA, LOW);
     digitalWrite(ENB, LOW);
-    if (debug)
-        Serial.println("Stop!");
+
+    debug_serial_println("stop");
 }
 /*
  Servo Control angle Setting

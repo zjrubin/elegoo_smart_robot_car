@@ -15,7 +15,7 @@
             "forcedInclude": [
                 "/opt/arduino-1.8.12/hardware/arduino/avr/cores/arduino/Arduino.h"
             ],
-            "defines": ["USBCON", "ARDUINO=181"],
+            "defines": ["USBCON", "ARDUINO=181", "DEBUG"],
             "compilerArgs": ["-felide-constructors"],
             "intelliSenseMode": "gcc-x64",
             "cStandard": "c18",
