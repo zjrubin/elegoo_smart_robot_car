@@ -1,0 +1,6 @@
+{
+    "sketch": "elegoo_smart_robot_car.ino",
+    "port": "/dev/ttyACM0",
+    "board": "arduino:avr:uno",
+    "output": "/tmp/arduino"
+}

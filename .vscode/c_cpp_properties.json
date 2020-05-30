@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/zach/.config/arduino/libraries/LiquidCrystal_I2C",
+                "${workspaceFolder}",
+                "/opt/arduino-1.8.12/hardware/arduino/avr/**",
+                "/opt/arduino-1.8.12/tools/**",
+                "/opt/arduino-1.8.12/hardware/tools/**",
+                "/opt/arduino-1.8.12/libraries/**",
+                "/home/zach/.config/arduino/libraries/**",
+                "/home/zach/.config/arduino/hardware/tools/**"
+            ],
+            "forcedInclude": [
+                "/opt/arduino-1.8.12/hardware/arduino/avr/cores/arduino/Arduino.h"
+            ],
+            "defines": ["USBCON", "ARDUINO=181"],
+            "compilerArgs": ["-felide-constructors"],
+            "intelliSenseMode": "gcc-x64",
+            "cStandard": "c18",
+            "cppStandard": "c++20"
+        }
+    ],
+    "version": 4
+}
