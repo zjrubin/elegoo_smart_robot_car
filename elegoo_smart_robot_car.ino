@@ -7,23 +7,26 @@
 
 #define BAUD_RATE 115200
 
-#define f 16736925 // FORWARD
-#define b 16754775 // BACK
-#define l 16720605 // LEFT
-#define r 16761405 // RIGHT
-#define s 16712445 // STOP
+#define IR_FORWARD 0xFF629D
+#define IR_FORWARD_UNKNOWN 0x511DBB
 
-#define UNKNOWN_F 5316027    // FORWARD
-#define UNKNOWN_B 2747854299 // BACK
-#define UNKNOWN_L 1386468383 // LEFT
-#define UNKNOWN_R 553536955  // RIGHT
-#define UNKNOWN_S 3622325019 // STOP
+#define IR_BACKWARD 0xFFA857
+#define IR_BACKWARD_UNKNOWN 0xA3C8EDDB
 
-#define KEY1 16738455 //Line Tracking mode
-#define KEY2 16750695 //Obstacles Avoidance mode
+#define IR_LEFT 0xFF22DD
+#define IR_LEFT_UNKNOWN 0x52A3D41F
 
-#define KEY_STAR 16728765
-#define KEY_HASH 16732845
+#define IR_RIGHT 0xFFC23D
+#define IR_RIGHT_UNKNOWN 0x20FE4DBB
+
+#define IR_STOP 0xFF02FD
+#define IR_STOP_UNKNOWN 0xD7E84B1B
+
+#define IR_ONE 0xFF6897 // Line Tracking mode
+#define IR_TWO 0xFF9867 // Obstacles Avoidance mode
+
+#define IR_ASTERISK 0xFF42BD
+#define IR_HASH 0xFF52AD
 
 /*Arduino pin is connected to the IR Receiver*/
 #define RECV_PIN 12
@@ -335,35 +338,35 @@ void getIRData(void)
         IR_PreMillis = millis();
         switch (results.value)
         {
-        case f:
-        case UNKNOWN_F:
+        case IR_FORWARD:
+        case IR_FORWARD_UNKNOWN:
             func_mode = IRremote;
             mov_mode = FORWARD;
             break; /*forward*/
-        case b:
-        case UNKNOWN_B:
+        case IR_BACKWARD:
+        case IR_BACKWARD_UNKNOWN:
             func_mode = IRremote;
             mov_mode = BACK;
             break; /*backward*/
-        case l:
-        case UNKNOWN_L:
+        case IR_LEFT:
+        case IR_LEFT_UNKNOWN:
             func_mode = IRremote;
             mov_mode = LEFT;
             break; /*left*/
-        case r:
-        case UNKNOWN_R:
+        case IR_RIGHT:
+        case IR_RIGHT_UNKNOWN:
             func_mode = IRremote;
             mov_mode = RIGHT;
             break; /*right*/
-        case s:
-        case UNKNOWN_S:
+        case IR_STOP:
+        case IR_STOP_UNKNOWN:
             func_mode = IRremote;
             mov_mode = STOP;
             break; /*stop*/
-        case KEY1:
+        case IR_ONE:
             func_mode = LineTracking;
             break; /*Line Tracking Mode*/
-        case KEY2:
+        case IR_TWO:
             func_mode = ObstaclesAvoidance;
             break; /*Obstacles Avoidance Mode*/
         default:
