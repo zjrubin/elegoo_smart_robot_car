@@ -1,16 +1,11 @@
-/*
- * @Description: In User Settings Edi
- * @Author: your name
- * @Date: 2019-08-12 18:00:25
- * @LastEditTime: 2019-08-27 10:45:29
- * @LastEditors: Please set LastEditors
- */
 #include <IRremote.h>
 #include <Servo.h>
 #include <stdio.h>
 #include "HardwareSerial.h"
 #include "ArduinoJson-v6.11.1.h" //Use ArduinoJson Libraries
 #include "arduino_debug.h"
+
+#define BAUD_RATE 115200
 
 #define f 16736925 // FORWARD
 #define b 16754775 // BACK
@@ -117,13 +112,52 @@ enum MOTIONMODE
     LEFT,    /*left*/
     RIGHT,   /*right*/
     FORWARD, /*forward*/
-    BACK,    /*back*/
+    BACK,    /*backward*/
     STOP,    /*stop*/
     LEFT_FORWARD,
     LEFT_BACK,
     RIGHT_FORWARD,
     RIGHT_BACK,
 } mov_mode = STOP; /*move mode*/
+
+void setup(void)
+{
+    Serial.begin(BAUD_RATE); //initialization
+    ServoControl(90);
+    irrecv.enableIRIn(); //Enable infrared communication NEC
+
+    pinMode(ECHO_PIN, INPUT); //Ultrasonic module initialization
+    pinMode(TRIG_PIN, OUTPUT);
+
+    pinMode(IN1, OUTPUT); //Motor-driven port configuration
+    pinMode(IN2, OUTPUT);
+    pinMode(IN3, OUTPUT);
+    pinMode(IN4, OUTPUT);
+    pinMode(ENA, OUTPUT);
+    pinMode(ENB, OUTPUT);
+
+    pinMode(LineTeacking_Pin_Right, INPUT); //Infrared tracking module port configuration
+    pinMode(LineTeacking_Pin_Middle, INPUT);
+    pinMode(LineTeacking_Pin_Left, INPUT);
+}
+
+void loop(void)
+{
+    getBTData_Plus();           //Bluetooth data acquisition
+    getIRData();                //Infrared data acquisition
+    bluetooth_mode();           //Bluetooth remote mode
+    irremote_mode();            //Infrared NEC remote control mode
+    line_teacking_mode();       //Line Teacking Mode
+    obstacles_avoidance_mode(); //Obstacles Avoidance Mode
+
+    CMD_Distance = getDistance(); //Ultrasonic measurement distance
+    /*CMD_MotorControl: Motor Control： Motor Speed、Motor Direction、Motor Time*/
+    CMD_MotorControl_Plus(CMD_MotorSelection, CMD_MotorDirection, CMD_MotorSpeed); //Control motor steering
+    /*  CMD mode：<Car control> APP control car*/
+    CMD_CarControl_Plus(CMD_CarDirection, CMD_CarSpeed, CMD_CarTimer); //Control the direction of the car<Time limited>
+    CMD_CarControl_Plusxxx(CMD_CarDirectionxxx, CMD_CarSpeedxxx);      //Control the direction of the car<No Time limited>
+    CMD_ClearAllFunctionsXXX();
+}
 
 void delays(unsigned long t)
 {
@@ -158,7 +192,7 @@ unsigned int getDistance(void)
 /*
   Control motor：Car movement forward
 */
-void forward(bool debug, int16_t in_carSpeed)
+void forward(int16_t in_carSpeed)
 {
     analogWrite(ENA, in_carSpeed);
     analogWrite(ENB, in_carSpeed);
@@ -172,7 +206,7 @@ void forward(bool debug, int16_t in_carSpeed)
 /*
   Control motor：Car moving backwards
 */
-void back(bool debug, int16_t in_carSpeed)
+void backward(int16_t in_carSpeed)
 {
     analogWrite(ENA, in_carSpeed);
     analogWrite(ENB, in_carSpeed);
@@ -186,7 +220,7 @@ void back(bool debug, int16_t in_carSpeed)
 /*
   Control motor：The car turns left and moves forward
 */
-void left(bool debug, int16_t in_carSpeed)
+void left(int16_t in_carSpeed)
 {
 
     analogWrite(ENA, in_carSpeed);
@@ -202,7 +236,7 @@ void left(bool debug, int16_t in_carSpeed)
 /*
   Control motor：The car turns right and moves forward
 */
-void right(bool debug, int16_t in_carSpeed)
+void right(int16_t in_carSpeed)
 {
     analogWrite(ENA, in_carSpeed);
     analogWrite(ENB, in_carSpeed);
@@ -214,7 +248,7 @@ void right(bool debug, int16_t in_carSpeed)
     debug_serial_println("right");
 }
 
-void forward_left(bool debug, int16_t in_carSpeed)
+void forward_left(int16_t in_carSpeed)
 {
     analogWrite(ENA, in_carSpeed / 2);
     analogWrite(ENB, in_carSpeed);
@@ -226,7 +260,7 @@ void forward_left(bool debug, int16_t in_carSpeed)
     debug_serial_println("forward left");
 }
 
-void forward_right(bool debug, int16_t in_carSpeed)
+void forward_right(int16_t in_carSpeed)
 {
     analogWrite(ENA, in_carSpeed);
     analogWrite(ENB, in_carSpeed / 2);
@@ -238,7 +272,7 @@ void forward_right(bool debug, int16_t in_carSpeed)
     debug_serial_println("forward right");
 }
 
-void back_left(bool debug, int16_t in_carSpeed)
+void back_left(int16_t in_carSpeed)
 {
     analogWrite(ENA, in_carSpeed / 2);
     analogWrite(ENB, in_carSpeed);
@@ -250,7 +284,7 @@ void back_left(bool debug, int16_t in_carSpeed)
     debug_serial_println("backward left");
 }
 
-void back_right(bool debug, int16_t in_carSpeed)
+void back_right(int16_t in_carSpeed)
 {
     analogWrite(ENA, in_carSpeed);
     analogWrite(ENB, in_carSpeed / 2);
@@ -265,7 +299,7 @@ void back_right(bool debug, int16_t in_carSpeed)
 /*
   Stop motor control：Turn off the motor drive
 */
-void stop(bool debug = false)
+void stop()
 {
     digitalWrite(ENA, LOW);
     digitalWrite(ENB, LOW);
@@ -310,7 +344,7 @@ void getIRData(void)
         case UNKNOWN_B:
             func_mode = IRremote;
             mov_mode = BACK;
-            break; /*back*/
+            break; /*backward*/
         case l:
         case UNKNOWN_L:
             func_mode = IRremote;
@@ -348,31 +382,31 @@ void bluetooth_mode()
         switch (mov_mode)
         {
         case LEFT:
-            left(false, carSpeed_rocker);
+            left(carSpeed_rocker);
             break;
         case RIGHT:
-            right(false, carSpeed_rocker);
+            right(carSpeed_rocker);
             break;
         case FORWARD:
-            forward(false, carSpeed_rocker);
+            forward(carSpeed_rocker);
             break;
         case BACK:
-            back(false, carSpeed_rocker);
+            backward(carSpeed_rocker);
             break;
         case STOP:
             stop();
             break;
         case LEFT_FORWARD:
-            forward_left(false, carSpeed_rocker);
+            forward_left(carSpeed_rocker);
             break;
         case LEFT_BACK:
-            back_left(false, carSpeed_rocker);
+            back_left(carSpeed_rocker);
             break;
         case RIGHT_FORWARD:
-            forward_right(false, carSpeed_rocker);
+            forward_right(carSpeed_rocker);
             break;
         case RIGHT_BACK:
-            back_right(false, carSpeed_rocker);
+            back_right(carSpeed_rocker);
             break;
         default:
             break;
@@ -389,16 +423,16 @@ void irremote_mode(void)
         switch (mov_mode)
         {
         case FORWARD:
-            forward(false, carSpeed);
+            forward(carSpeed);
             break;
         case BACK:
-            back(false, carSpeed);
+            backward(carSpeed);
             break;
         case LEFT:
-            left(false, carSpeed);
+            left(carSpeed);
             break;
         case RIGHT:
-            right(false, carSpeed);
+            right(carSpeed);
             break;
         case STOP:
             stop();
@@ -423,13 +457,13 @@ void line_teacking_mode(void)
         if (LineTeacking_Read_Middle)
         { //Detecting in the middle infrared tube
 
-            forward(false, 180); //Control motor：the car moving forward
+            forward(180); //Control motor：the car moving forward
             LT_PreMillis = millis();
         }
         else if (LineTeacking_Read_Right)
         { //Detecting in the right infrared tube
 
-            right(false, 180); //Control motor：the car moving right
+            right(180); //Control motor：the car moving right
             while (LineTeacking_Read_Right)
             {
                 getBTData_Plus(); //Bluetooth data acquisition
@@ -438,8 +472,8 @@ void line_teacking_mode(void)
             LT_PreMillis = millis();
         }
         else if (LineTeacking_Read_Left)
-        {                     //Detecting in the left infrared tube
-            left(false, 180); //Control motor：the car moving left
+        {              //Detecting in the left infrared tube
+            left(180); //Control motor：the car moving left
             while (LineTeacking_Read_Left)
             {
                 getBTData_Plus(); //Bluetooth data acquisition
@@ -512,7 +546,7 @@ void obstacles_avoidance_mode(void)
         }
         else if (function_xxx(get_Distance, 20, 50))
         {
-            forward(false, 150); //Control car forwar
+            forward(150); //Control car forwar
         }
         while (switc_ctrl)
         {
@@ -521,25 +555,25 @@ void obstacles_avoidance_mode(void)
             case 1:
             case 5:
             case 6:
-                forward(false, 150); //Control car forwar
+                forward(150); //Control car forwar
                 switc_ctrl = 0;
                 break;
             case 3:
-                left(false, 250); //Control car left
+                left(250); //Control car left
                 switc_ctrl = 0;
                 break;
             case 4:
-                left(false, 250); //Control car left
+                left(250); //Control car left
                 switc_ctrl = 0;
                 break;
             case 8:
             case 11:
-                right(false, 250); //Control car right
+                right(250); //Control car right
                 switc_ctrl = 0;
                 break;
             case 9:
             case 10:
-                back(false, 150); //Control car Car backwards
+                backward(150); //Control car Car backwards
                 switc_ctrl = 11;
                 break;
             }
@@ -733,16 +767,16 @@ void CMD_CarControl_Plus(uint8_t is_CarDirection, uint8_t is_CarSpeed, uint8_t i
             switch (is_CarDirection)
             {
             case 1: /*Left-Forward Motion Mode*/
-                left(false, is_CarSpeed);
+                left(is_CarSpeed);
                 break;
             case 2: /*Right-Forward Motion Mode*/
-                right(false, is_CarSpeed);
+                right(is_CarSpeed);
                 break;
             case 3: /*Sport mode forward*/
-                forward(false, is_CarSpeed);
+                forward(is_CarSpeed);
                 break;
-            case 4: /*Sport mode back*/
-                back(false, is_CarSpeed);
+            case 4: /*Sport mode backward*/
+                backward(is_CarSpeed);
                 break;
             default:
                 break;
@@ -776,16 +810,16 @@ void CMD_CarControl_Plusxxx(uint8_t is_CarDirection, uint8_t is_CarSpeed)
         switch (is_CarDirection)
         {
         case 1: /*Left-Forward Motion Mode*/
-            left(false, is_CarSpeed);
+            left(is_CarSpeed);
             break;
         case 2: /*Right-Forward Motion Mode*/
-            right(false, is_CarSpeed);
+            right(is_CarSpeed);
             break;
         case 3: /*Sport mode forward*/
-            forward(false, is_CarSpeed);
+            forward(is_CarSpeed);
             break;
-        case 4: /*Sport mode back*/
-            back(false, is_CarSpeed);
+        case 4: /*Sport mode backward*/
+            backward(is_CarSpeed);
             break;
         default:
             break;
@@ -841,7 +875,6 @@ void getDistance_xx(void)
 /*
   Bluetooth serial port data acquisition and control command parsing
 */
-#include "HardwareSerial.h"
 void getBTData_Plus(void)
 {
     static String SerialPortData = "";
@@ -1060,42 +1093,4 @@ void getBTData_Plus(void)
             SerialPortData = "";
         }
     }
-}
-void setup(void)
-{
-    Serial.begin(9600); //initialization
-    ServoControl(90);
-    irrecv.enableIRIn(); //Enable infrared communication NEC
-
-    pinMode(ECHO_PIN, INPUT); //Ultrasonic module initialization
-    pinMode(TRIG_PIN, OUTPUT);
-
-    pinMode(IN1, OUTPUT); //Motor-driven port configuration
-    pinMode(IN2, OUTPUT);
-    pinMode(IN3, OUTPUT);
-    pinMode(IN4, OUTPUT);
-    pinMode(ENA, OUTPUT);
-    pinMode(ENB, OUTPUT);
-
-    pinMode(LineTeacking_Pin_Right, INPUT); //Infrared tracking module port configuration
-    pinMode(LineTeacking_Pin_Middle, INPUT);
-    pinMode(LineTeacking_Pin_Left, INPUT);
-}
-
-void loop(void)
-{
-    getBTData_Plus();           //Bluetooth data acquisition
-    getIRData();                //Infrared data acquisition
-    bluetooth_mode();           //Bluetooth remote mode
-    irremote_mode();            //Infrared NEC remote control mode
-    line_teacking_mode();       //Line Teacking Mode
-    obstacles_avoidance_mode(); //Obstacles Avoidance Mode
-
-    CMD_Distance = getDistance(); //Ultrasonic measurement distance
-    /*CMD_MotorControl: Motor Control： Motor Speed、Motor Direction、Motor Time*/
-    CMD_MotorControl_Plus(CMD_MotorSelection, CMD_MotorDirection, CMD_MotorSpeed); //Control motor steering
-    /*  CMD mode：<Car control> APP control car*/
-    CMD_CarControl_Plus(CMD_CarDirection, CMD_CarSpeed, CMD_CarTimer); //Control the direction of the car<Time limited>
-    CMD_CarControl_Plusxxx(CMD_CarDirectionxxx, CMD_CarSpeedxxx);      //Control the direction of the car<No Time limited>
-    CMD_ClearAllFunctionsXXX();
 }
