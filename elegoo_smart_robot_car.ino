@@ -23,7 +23,10 @@
 #define IR_STOP_UNKNOWN 0xD7E84B1B
 
 #define IR_ONE 0xFF6897 // Line Tracking mode
+#define IR_ONE_UNKNOWN 0xC101E57B
+
 #define IR_TWO 0xFF9867 // Obstacles Avoidance mode
+#define IR_TWO_UNKNOWN 0x97483BFB
 
 #define IR_ASTERISK 0xFF42BD
 #define IR_HASH 0xFF52AD
@@ -364,9 +367,11 @@ void getIRData(void)
             mov_mode = STOP;
             break; /*stop*/
         case IR_ONE:
+        case IR_ONE_UNKNOWN:
             func_mode = LineTracking;
             break; /*Line Tracking Mode*/
         case IR_TWO:
+        case IR_TWO_UNKNOWN:
             func_mode = ObstaclesAvoidance;
             break; /*Obstacles Avoidance Mode*/
         default:
