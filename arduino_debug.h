@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#ifdef DEBUG
+#ifdef ARDUINO_DEBUG
 #define DEBUG_TEST 1
 #else
 #define DEBUG_TEST 0

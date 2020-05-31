@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include "HardwareSerial.h"
 #include "ArduinoJson-v6.11.1.h" //Use ArduinoJson Libraries
+
+#define ARDUINO_DEBUG
 #include "arduino_debug.h"
 
 #define BAUD_RATE 115200
