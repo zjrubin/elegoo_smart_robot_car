@@ -38,7 +38,7 @@
 // its superloop. CHANGE this timeout period when the code is refactored
 // A smaller timeout period is better as it translates less latency between
 // Releasing a IR button and the car no longer moving according to that button
-#define IR_TIMEOUT 150
+#define IR_TIMEOUT 100
 
 extern IRrecv irrecv;          //  Create an infrared receive drive object
 extern decode_results results; //  Create decoding object
