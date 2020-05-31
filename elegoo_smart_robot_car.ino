@@ -19,7 +19,7 @@
 #define UNKNOWN_R 553536955  // RIGHT
 #define UNKNOWN_S 3622325019 // STOP
 
-#define KEY1 16738455 //Line Teacking mode
+#define KEY1 16738455 //Line Tracking mode
 #define KEY2 16750695 //Obstacles Avoidance mode
 
 #define KEY_STAR 16728765
@@ -44,13 +44,13 @@ const int ObstacleDetection = 35;
 #define LED_Pin 13
 
 /*Arduino pin is connected to the IR tracking module*/
-#define LineTeacking_Pin_Right 10
-#define LineTeacking_Pin_Middle 4
-#define LineTeacking_Pin_Left 2
+#define LineTracking_Pin_Right 10
+#define LineTracking_Pin_Middle 4
+#define LineTracking_Pin_Left 2
 
-#define LineTeacking_Read_Right !digitalRead(10) //Right
-#define LineTeacking_Read_Middle !digitalRead(4) //Middle
-#define LineTeacking_Read_Left !digitalRead(2)   //Left
+#define LineTracking_Read_Right !digitalRead(10) //Right
+#define LineTracking_Read_Middle !digitalRead(4) //Middle
+#define LineTracking_Read_Left !digitalRead(2)   //Left
 
 #define carSpeed 250 //PWM(Motor speed/Speed)
 
@@ -97,7 +97,7 @@ enum SERIAL_mode
 enum FUNCTIONMODE
 {
     IDLE,                  /*free*/
-    LineTeacking,          /*Line Teacking Mode*/
+    LineTracking,          /*Line Tracking Mode*/
     ObstaclesAvoidance,    /*Obstacles Avoidance Mode*/
     Bluetooth,             /*Bluetooth Control Mode*/
     IRremote,              /*Infrared Control Mode*/
@@ -136,9 +136,9 @@ void setup(void)
     pinMode(ENA, OUTPUT);
     pinMode(ENB, OUTPUT);
 
-    pinMode(LineTeacking_Pin_Right, INPUT); //Infrared tracking module port configuration
-    pinMode(LineTeacking_Pin_Middle, INPUT);
-    pinMode(LineTeacking_Pin_Left, INPUT);
+    pinMode(LineTracking_Pin_Right, INPUT); //Infrared tracking module port configuration
+    pinMode(LineTracking_Pin_Middle, INPUT);
+    pinMode(LineTracking_Pin_Left, INPUT);
 }
 
 void loop(void)
@@ -147,7 +147,7 @@ void loop(void)
     getIRData();                //Infrared data acquisition
     bluetooth_mode();           //Bluetooth remote mode
     irremote_mode();            //Infrared NEC remote control mode
-    line_teacking_mode();       //Line Teacking Mode
+    line_tracking_mode();       //Line Tracking Mode
     obstacles_avoidance_mode(); //Obstacles Avoidance Mode
 
     CMD_Distance = getDistance(); //Ultrasonic measurement distance
@@ -361,8 +361,8 @@ void getIRData(void)
             mov_mode = STOP;
             break; /*stop*/
         case KEY1:
-            func_mode = LineTeacking;
-            break; /*Line Teacking Mode*/
+            func_mode = LineTracking;
+            break; /*Line Tracking Mode*/
         case KEY2:
             func_mode = ObstaclesAvoidance;
             break; /*Obstacles Avoidance Mode*/
@@ -448,33 +448,33 @@ void irremote_mode(void)
     }
 }
 /*
-  Line Teacking Mode
+  Line Tracking Mode
 */
-void line_teacking_mode(void)
+void line_tracking_mode(void)
 {
-    if (func_mode == LineTeacking)
+    if (func_mode == LineTracking)
     {
-        if (LineTeacking_Read_Middle)
+        if (LineTracking_Read_Middle)
         { //Detecting in the middle infrared tube
 
             forward(180); //Control motor：the car moving forward
             LT_PreMillis = millis();
         }
-        else if (LineTeacking_Read_Right)
+        else if (LineTracking_Read_Right)
         { //Detecting in the right infrared tube
 
             right(180); //Control motor：the car moving right
-            while (LineTeacking_Read_Right)
+            while (LineTracking_Read_Right)
             {
                 getBTData_Plus(); //Bluetooth data acquisition
                 getIRData();      //Infrared data acquisition
             }
             LT_PreMillis = millis();
         }
-        else if (LineTeacking_Read_Left)
+        else if (LineTracking_Read_Left)
         {              //Detecting in the left infrared tube
             left(180); //Control motor：the car moving left
-            while (LineTeacking_Read_Left)
+            while (LineTracking_Read_Left)
             {
                 getBTData_Plus(); //Bluetooth data acquisition
                 getIRData();      //Infrared data acquisition
@@ -618,13 +618,13 @@ void CMD_UltrasoundModuleStatus_Plus(uint8_t is_get) //Ultrasonic module process
 }
 /*
   N22:command
-   CMD mode：Teacking module：App controls module status, module sends data to app
+   CMD mode：Tracking module：App controls module status, module sends data to app
 */
 void CMD_TraceModuleStatus_Plus(uint8_t is_get) //Tracking module processing
 {
     if (0 == is_get) /*Get traces on the left*/
     {
-        if (LineTeacking_Read_Left)
+        if (LineTracking_Read_Left)
         {
             //Serial.print("{true}");
             Serial.print('{' + CommandSerialNumber + "_true}");
@@ -637,7 +637,7 @@ void CMD_TraceModuleStatus_Plus(uint8_t is_get) //Tracking module processing
     }
     else if (1 == is_get) /*Get traces on the middle*/
     {
-        if (LineTeacking_Read_Middle)
+        if (LineTracking_Read_Middle)
         {
             //Serial.print("{true}");
             Serial.print('{' + CommandSerialNumber + "_true}");
@@ -651,7 +651,7 @@ void CMD_TraceModuleStatus_Plus(uint8_t is_get) //Tracking module processing
     else if (2 == is_get)
     { /*Get traces on the right*/
 
-        if (LineTeacking_Read_Right)
+        if (LineTracking_Read_Right)
         {
             //Serial.print("{true}");
             Serial.print('{' + CommandSerialNumber + "_true}");
@@ -981,9 +981,9 @@ void getBTData_Plus(void)
             case 3: /*Remote switching mode  processing <command：N 3>*/
             {
                 Serial_mode = Serial_rocker;
-                if (1 == doc["D1"]) // Line Teacking Mode
+                if (1 == doc["D1"]) // Line Tracking Mode
                 {
-                    func_mode = LineTeacking;
+                    func_mode = LineTracking;
                     Serial.print('{' + CommandSerialNumber + "_ok}");
                 }
                 else if (2 == doc["D1"]) //Obstacles Avoidance Mode
@@ -1084,7 +1084,7 @@ void getBTData_Plus(void)
         }
         else if (true == SerialPortData.equals("1"))
         {
-            func_mode = LineTeacking;
+            func_mode = LineTracking;
             SerialPortData = "";
         }
         else if (true == SerialPortData.equals("2"))
