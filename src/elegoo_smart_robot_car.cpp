@@ -10,6 +10,8 @@
 #define ARDUINO_DEBUG
 #include "arduino_debug.h"
 
+#include <Arduino.h>
+
 #define BAUD_RATE 115200
 
 #define LED_Pin 13
@@ -17,6 +19,8 @@
 int rightDistance = 0;  //Right distance
 int leftDistance = 0;   //left Distance
 int middleDistance = 0; //middle Distance
+
+void obstacles_avoidance_mode(void);
 
 void setup(void)
 {
