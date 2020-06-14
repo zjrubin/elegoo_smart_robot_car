@@ -330,18 +330,18 @@ void CMD_ClearAllFunctionsXXX(void)
         digitalWrite(ENB, LOW);
 
         /*CMD_MotorControl:Motor Control： Motor Speed、Motor Direction、Motor Time*/
-        CMD_MotorSelection = NULL;
-        CMD_MotorDirection = NULL;
+        CMD_MotorSelection = 0;
+        CMD_MotorDirection = 0;
 
-        CMD_MotorSpeed = NULL;
-        CMD_leftMotorControl_Millis = NULL;
-        CMD_rightMotorControl_Millis = NULL;
+        CMD_MotorSpeed = 0;
+        CMD_leftMotorControl_Millis = 0;
+        CMD_rightMotorControl_Millis = 0;
 
         /*CMD_CarControl:Car Control：Car moving direction、Car Speed、Car moving time*/
-        CMD_CarDirection = NULL;
-        CMD_CarSpeed = NULL;
-        CMD_CarTimer = NULL;
-        CMD_CarControl_Millis = NULL;
+        CMD_CarDirection = 0;
+        CMD_CarSpeed = 0;
+        CMD_CarTimer = 0;
+        CMD_CarControl_Millis = 0;
     }
 }
 
@@ -357,7 +357,7 @@ void getDistance_xx(void)
 void getBTData_Plus(void)
 {
     static String SerialPortData = "";
-    uint8_t c = "";
+    uint8_t c = 0;
     if (Serial.available() > 0)
     {
         while ((c != '}') && Serial.available() > 0) //Forcibly wait for a frame of data to finish receiving

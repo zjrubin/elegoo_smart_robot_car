@@ -1,4 +1,5 @@
 
+#include "arduino_debug.h"
 #include "bluetooth.h"
 #include "infrared.h"
 #include "line_tracking.h"
@@ -7,12 +8,7 @@
 #include "ultrasonic.h"
 #include "utility.h"
 
-#define ARDUINO_DEBUG
-#include "arduino_debug.h"
-
 #include <Arduino.h>
-
-#define BAUD_RATE 115200
 
 #define LED_Pin 13
 

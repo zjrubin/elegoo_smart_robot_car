@@ -1,9 +1,8 @@
 #include "infrared.h"
+
+#include "arduino_debug.h"
 #include "motor.h"
 #include "utility.h"
-
-// MIGHT HAVE TO DEFINE ARDUINO_DEBUG BEFORE THIS INCLUDE
-#include "arduino_debug.h"
 
 IRrecv irrecv(RECV_PIN); //  Create an infrared receive drive object
 decode_results results;  //  Create decoding object
